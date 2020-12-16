@@ -1,6 +1,5 @@
 using DoctorDocstrings
 using TerminalUserInterfaces
-using MacroTools
 using Test
     module testme
         struct Foo end

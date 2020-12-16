@@ -4,12 +4,7 @@ authors = ["miguel raz <miguelraz@gmail.com> and contributors"]
 version = "0.1.0"
 
 [deps]
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
-Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 TerminalUserInterfaces = "408767e4-586b-40c7-9657-f9758988469a"
-TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]
 julia = "1"
