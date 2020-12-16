@@ -17,13 +17,15 @@ function hasexamples(f)
 end
 
 function make_data(mod)
-    col1 = [getfield(mod, i) for i in names(mod)]
+    length(names(mod)) < 1 && Error("Your $mod does not export any names")
+    lennames = length(names(mod))
+    col1 = [getfield(mod, i) for i in names(mod) if isdefined(mod, i)]
     col2 = [hasdocs(j) for j in col1]
     col3 = [hasexamples(k) for k in col1]
 
     f1 = "Total %"
-    f2 = @sprintf("%.2f", count(hasdocs(j) for j in col1)/length(col1)) 
-    f3 = @sprintf("%.2f", count(hasexamples(k) for k in col1)/length(col3))
+    f2 = @sprintf("%.2f", count(hasdocs(j) for j in col1)/lennames)
+    f3 = @sprintf("%.2f", count(hasexamples(k) for k in col1)/lennames)
     footer = [f1 f2 f3]
 
     data = vcat(hcat(col1, col2, col3), footer)
@@ -134,13 +136,15 @@ function instructprompt(doctarget = "your functions")
     @info "You will be able to copy/paste them by calling 'fixdocs()'"
 end
 
-function diagnosedocs(mod, verbose = false)
+function diagnosedocs(mod, verbose = true)
     table = list_no_docs(mod, false, false)
     fixables = findfixables(table)
     if isempty(fixables)
         return println("Yay! All your exports have docs and examples!")
     end
-    instructprompt()
+    if verbose
+        instructprompt()
+    end
     return Table(NeedFixes = fixables)
 end
 
