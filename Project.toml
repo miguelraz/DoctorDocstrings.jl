@@ -4,7 +4,10 @@ authors = ["miguel raz <miguelraz@gmail.com> and contributors"]
 version = "0.1.0"
 
 [deps]
-TerminalUserInterfaces = "408767e4-586b-40c7-9657-f9758988469a"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+TerminalMenus = "dc548174-15c3-5faf-af27-7997cfbde655"
 
 [compat]
 julia = "1"
