@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- META -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Miguel Raz Guzmán Macedo">
+  <title>DoctorDocstrings.jl</title>
+
+  <link rel="icon" type="image/png"  href="/assets/favicon.ico">
+
+  <!-- CSS -->
+  
+   <link rel="stylesheet" href="/libs/highlight/styles/atom-one-dark.css">
+   
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <style>.bg-primary {
+  background-color: #3f6388 !important;
+}
+
+a {
+  color: #2669DD;
+}
+
+a:hover {
+  color: teal;
+}
+
+.section-bg-color {
+  background-color: #f6f8fa;
+}
+
+footer a {
+  color: cornflowerblue;
+}
+
+
+header {
+  margin-top: 55px !important;
+}
+
+
+
+.jumbotron {
+  background-image: url("assets/diagonal-lines.svg");
+  background-repeat: repeat;
+}
+
+
+/* CODE ADJUSTMENTS */
+
+pre code.hljs {
+  border-radius: 10px;
+}
+
+pre code.hljs.plaintext {
+  margin-left: 15px;
+}
+</style>
+  <link rel="stylesheet" href="/css/custom.css">
+
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+<body id="page-top">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+  <div class="container">
+    <span class="navbar-brand">
+      
+        <img src="/assets/logo.svg" class="img-fluid" style="height:         25px;
+padding-right:  10px;
+" alt="Logo"/>
+      
+      <a href="#page-top">DoctorDocstrings.jl</a>
+      
+    </span>
+    <input type="checkbox" id="navbar-toggler-cbox" class="d-none" />
+    <label for="navbar-toggler-cbox" class="navbar-toggler" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </label>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="#about">About</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="#getting_started">Getting started</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="#workflow">Workflow</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <header class="text-white text-center">
+  
+    <div class="jumbotron jumbotron-fluid container-fluid bg-primary">
+  
+    <h1>DoctorDocstrings.jl</h1>
+    <div class="lead">Diagnose the missing docstrings in your package. Copy paste from your REPL the smart inputs straight into your docstrings.
+</div>
+    
+      <a class="github-button" href="https://github.com/miguelraz/DoctorDocstrings.jl" data-size="large" aria-label="View DoctorDocstrings.jl on GitHub">View on GitHub</a>
+    
+    
+      <a class="github-button" href="https://github.com/miguelraz/DoctorDocstrings.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star DoctorDocstrings.jl on GitHub">Star</a>
+    
+  </div>
+</header>
+
+  <!-- Content appended here -->
+<div class="franklin-content"><section id="about" class="scrollspy section-bg-color">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>About this Package</h2></p>
+<div class="lead">DoctorDocstrings.jl helps you list the exports in your package that don&#39;t have docstrings/examples, set a docstring template and copy your REPL history directly into the docstring.</div>
+<p>With it you can:</p>
+<ul>
+<li><p><code>nodocs&#40;OhMyREPL&#41;</code> to get a <code>TypedTable</code> of the exports and if they have docs/examples.</p>
+</li>
+<li><p><code>diagnosedocs&#40;LightGraphs&#41;</code> to get a <code>TypedTable</code> of exports that need fixing.</p>
+</li>
+<li><p><code>pickandcopy&#40;n&#41;</code> to choose up to the last <code>n</code> items in your REPL and paste them into your clipboard</p>
+</li>
+<li><p><code>fixdocs&#40;&#41;</code> to select from your REPL history and step into the last selection.</p>
+</li>
+</ul>
+<p>      </div>
+    </div>
+  </div>
+</section>
+<section id="getting_started" class="scrollspy">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>Getting started</h2></p>
+<p>In order to get started, just add the package &#40;with <strong>Julia ≥ 1.3</strong>&#41; and</p>
+<pre><code class="language-julia-repl">julia&gt; using DoctorDocstrings
+julia&gt; nodocs&#40;DifferentialEquations&#41;
+julia&gt; # Play in the REPL for a few commands
+julia&gt; fixdocs&#40;&#41;</code></pre>
+<br/>
+<p>It&#39;s usually cumbersome to have to copy-paste your REPL history when you are exploring what works. Now, you can inject it into a docstring template. Just figure out which docstrings you are missing with <code>nodocs&#40;Plots&#41;</code>, type your setup into the REPL, select the appropriate history with <code>fixdocs&#40;&#41;</code> and paste the docstring into your favorite editor.</p>
+<div class="alert alert-info" role="alert">
+This software is VERY much alpha, but it should work for simple module structures. <code>Base</code> in particular is tricky to handle. Many things are hardcoded and not too extensible. Please, if you find it borking out, send an issue/PR.</div>
+<p>      </div>
+    </div>
+  </div>
+</section>
+<section id="workflow" class="scrollspy section-bg-color">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <h2>Workflow</h2></p>
+<p>Here&#39;s the result from running <code>diagnosedocs&#40;OrdinaryDiffEq&#41;</code>:</p>
+<pre><code class="language-julia-repl">julia&gt; list_no_docs&#40;OrdinaryDiffEq&#41;
+Table with 3 columns and 396 rows:
+      Functions                  Docs   Examples
+    ┌───────────────────────────────────────────
+ 1  │ AB3                        true   false
+ 2  │ AB4                        true   false
+ 3  │ AB5                        true   false
+ 4  │ ABDF2                      true   false
+ 5  │ ABM32                      true   false
+ 6  │ ABM43                      true   false
+ 7  │ ABM54                      true   false
+ 8  │ AN5                        false  false
+ 9  │ AbstractAnalyticalProblem  true   false
+ 10 │ AffineDiffEqOperator       true   false
+...</code></pre>
+<p>If you want to get a list only of the offending exports, it would look like this:</p>
+<pre><code class="language-julia-repl">julia&gt; diagnosedocs&#40;LightGraphs&#41;
+&#91; Info: You should now write a few examples of a docstring for your functions in the REPL
+&#91; Info: You will be able to copy/paste them by calling &#39;fixdocs&#40;&#41;&#39;
+Table with 1 column and 65 rows:
+      NeedFixes
+    ┌────────────────────────────
+ 1  │ BarbellGraph
+ 2  │ BinaryTree
+ 3  │ BullGraph
+ 4  │ ChvatalGraph
+ 5  │ Circularladder_graph
+ 6  │ CliqueGraph
+ 7  │ CompleteBipartiteGraph
+ 8  │ CompleteDiGraph
+ 9  │ CompleteGraph
+ 10 │ CompleteMultipartiteGraph</code></pre>
+<p>&#40;The <code>Info</code> prompt can be turned off with <code>diagnosedocs&#40;LightGraphs, false&#41;</code>.&#41;</p>
+<p>OK, let&#39;s say you decide to add some docstrings to the <code>CliqueGraph</code> function. Like any self-respecting Julian, we start to play around in the REPL.</p>
+<pre><code class="language-julia-repl">julia&gt; g &#61; CliqueGraph&#40;3,3&#41;
+&#123;9, 12&#125; undirected simple Int64 graph
+
+julia&gt; nedges&#40;g&#41;
+ERROR: UndefVarError: nedges not defined
+Stacktrace:
+ &#91;1&#93; top-level scope
+   @ REPL&#91;34&#93;:1
+
+julia&gt; g&#91;1,2&#93;
+ERROR: MethodError: no method matching getindex&#40;::SimpleGraph&#123;Int64&#125;, ::Int64, ::Int64&#41;
+Closest candidates are:
+  getindex&#40;::AbstractGraph, ::Any&#41; at /home/mrg/.julia/packages/LightGraphs/QpMj2/src/operators.jl:689
+Stacktrace:
+ &#91;1&#93; top-level scope
+   @ REPL&#91;35&#93;:1
+fadjlist ne
+julia&gt; g.ne
+12
+
+julia&gt; g.fadjlist
+9-element Vector&#123;Vector&#123;Int64&#125;&#125;:
+ &#91;2, 3, 4, 7&#93;
+ &#91;1, 3&#93;
+ &#91;1, 2&#93;
+ &#91;1, 5, 6, 7&#93;
+ &#91;4, 6&#93;
+ &#91;4, 5&#93;
+ &#91;1, 4, 8, 9&#93;
+ &#91;7, 9&#93;
+ &#91;7, 8&#93;
+julia&gt; CliqueGraph&#40;1,1&#41;;</code></pre>
+<p>Nice&#33; After some mucking about, I figured out how to construct the examples to go into the docstring. But ughhhh, I made a few typos along the way. <strong>No sweat&#33;</strong>, with <code>fixdocs&#40;&#41;</code>, I can choose which previous inputs I want copied into my clipboard.</p>
+<pre><code class="language-julia-repl">Pick your history to copy:
+&#91;press: d&#61;done, a&#61;all, n&#61;none&#93;
+   &#91;X&#93; julia&gt; g &#61; CliqueGraph&#40;3,3&#41;\n
+   &#91; &#93; julia&gt; nedges&#40;g&#41;\n
+   &#91; &#93; julia&gt; g&#91;1,2&#93;\n
+ &gt; &#91;X&#93; julia&gt; g.ne\n
+   &#91;X&#93; julia&gt; g.fadjlist\n
+   &#91; &#93; julia&gt; pickandcopy&#40;10&#41;\n
+   &#91; &#93; julia&gt; newpage&#40;&#41;\n
+   &#91; &#93; ;serve&#40;&#41;\n
+   &#91; &#93; ;vim page/Project.toml\n
+   &#91; &#93; ;cd page\n</code></pre>
+<p>This is the job of <code>pickandcopy</code>, which is <strong>super useful</strong> if you are preparing for a live demo and want to only copy your inputs that worked. Notice that I didn&#39;t select my flubs, and they don&#39;t get added to my clipboard.</p>
+<p>Lastly, you will be prompted if you want to <code>@edit</code> your last selection. In the example above, I would jump straight in to edit the docstring for <code>CliqueGraph</code> with a chosen template.</p>
+<p>The template will be chosen through a terminal menu, but you can define your own string and pass it to <code>fixdocs&#40;template&#41;</code> and it should <code>Just Work</code>TM.</p>
+<p>As always, PRs welcome.</p>
+<p>      </div>
+    </div>
+  </div>
+</section>
+<footer class="py-5 bg-dark">
+  <div class="container">
+    <p class="m-0 text-center text-white">&copy; Miguel Raz Guzmán Macedo. Website powered by <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a>, <a href="https://github.com/tlienart/PkgPage.jl">PkgPage.jl</a> and the <a href="https://julialang.org">Julia</a> programming language.</p>
+  </div>
+</footer>
+</div><!-- CONTENT ENDS HERE -->
+  
+  
+      <script src="/libs/highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+
+  
+  <script src="/libs/simple-scrollspy.min.js"></script>
+  <script>
+  window.onload = function () {
+    scrollSpy('#navbarResponsive', {
+      sectionClass: '.scrollspy',
+      menuActiveTarget: '.nav-link',
+      offset: 100
+    })
+  }
+  </script>
+  </body>
+</html>
