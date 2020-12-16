@@ -3,6 +3,7 @@ using Test
 using TerminalMenus
 using Printf
 using TypedTables
+using REPL
 
     module testme
         struct Foo end
@@ -82,7 +83,7 @@ function make_data(mod)
     col2 = [hasdocs(j) for j in col1]
     col3 = [hasexamples(k) for k in col1]
 
-    f1 = "%"
+    f1 = "Total %"
     f2 = @sprintf("%.2f", count(hasdocs(j) for j in col1)/length(col1)) 
     f3 = @sprintf("%.2f", count(hasexamples(k) for k in col1)/length(col3))
     footer = [f1 f2 f3]
@@ -110,12 +111,12 @@ end
 #    f_data
 #end
 
-function list_no_docs(mod, fun = false, footer = true)
+function list_no_docs(mod, footer = true, fun = false)
     data = make_data(mod)
 #    f_data = format_data(data, fun)
     table = Table(Functions = data[:,1], Docs = data[:,2], Examples = data[:,3])
 #    return f_data, table
-return footer ? table[1:end-1, :] : table
+    return footer ? table : table[1:end-1, :]
 end
 
 # TODO Fix buggy shell and pkg starting lines
@@ -151,23 +152,26 @@ function pickandcopy(n=25, keeprepl = false)
     options = history_parser(n)
     menu = MultiSelectMenu(options, pagesize = n)
     choices = request("Pick your history to copy:", menu)
-    picks = join([options[i] for i in choices], '\n')
+    picks = sort([options[i] for i in choices])
+    latest_entry = picks[end]
+    picks = join(picks, '\n')
     if length(choices) > 0
         println("Copied $(length(choices)) items to clipboard")
     else
         println("Boo :(")
     end
-    picks
+    # TODO Fix this horrible hack to not get the "julia> "
+    picks, latest_entry[7:end]
 end
 
 findfixables(table) = table.Functions[.!(table.Docs .| table.Examples)]
 
 function buildpastestring(template_str, copypicks)
     template_str * """
-    Examples
-    ====
-    ```jldoctest
-    """ * copypicks * raw"```\"\"\""
+Examples
+====
+```jldoctest
+""" * '\n' * copypicks * "\n```\n\"\"\""
 end
 #1. Get REPL history DONE
 #2. find first fixable doc string
@@ -175,15 +179,39 @@ end
 #3. append Example header * REPL History to template, 
 #3.5 put that into the clipboard
 #4. open editor
-function preparedocfixes(mod, template = picktemplate(docstr_templates), nhistory = 25)
-    picks = pickandcopy(nhistory)
-    table = list_no_docs(mod, false)
+#
+
+function editprompt(latest_entry)
+    println("Templated docstrings with example has been pasted into your system clipboard")
+    println("Would you like to @edit $(latest_entry[1:end-1]) ? Y/N")
+    if any(occursin.(["yes", "Y", "YES", "y", "Yes"], readline()))
+        expr = Meta.parse(latest_entry)
+        @eval @edit $(expr)
+    else
+        println("Didn't get a Yes/YES/y/Y/Yes answer. Appointment canceled.")
+    end
+end
+
+
+function diagnosedocs(mod, verbose = false)
+    table = list_no_docs(mod, false, false)
     fixables = findfixables(table)
     if isempty(fixables)
         return println("Yay! All your exports have docs and examples!")
+    else
+        println("------------------------------------------")
+        println("The following  $(length(fixables)) exports need docs/examples")
+        println("The first ")
+        foreach(println, fixables)
+        println(table[end, :])
     end
+end
+
+function fixdocs(template = picktemplate(docstr_templates), nhistory = 25)
+    picks, latest_entry = pickandcopy(nhistory)
     pastestring = buildpastestring(template, picks)
     clipboard(pastestring)
+    editprompt(latest_entry)
 end
 
 function picktemplate(docstr_templates)
@@ -199,7 +227,7 @@ end
 
 
 doc_example_template = """
-
+\"\"\"
     foo(T) -> S
 
 This function calls `foo`.
@@ -281,8 +309,8 @@ banner = raw"""
    .|____/|_(_)|____/.\___/.\___|___/\__|_|..|_|_|.|_|\__,.|___(_)/.|_|
    ...................................................|___/.....|__/...
    For the Julia community with <3
-"""
-
+""";
+""
 #Maybe piracy?
 
 
