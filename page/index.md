@@ -8,7 +8,7 @@
 
 With it you can:
 
-* `nodocs(OhMyREPL)` to get a `TypedTable` of the exports and if they have docs/examples.
+* `list_no_docs(OhMyREPL)` to get a `TypedTable` of the exports and if they have docs/examples.
 * `diagnosedocs(LightGraphs)` to get a `TypedTable` of exports that need fixing.
 * `pickandcopy(n)` to choose up to the last `n` items in your REPL and paste them into your clipboard
 * `fixdocs()` to select from your REPL history and step into the last selection.
