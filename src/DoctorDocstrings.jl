@@ -6,7 +6,7 @@ using TypedTables
 using REPL
 import InteractiveUtils: clipboard, @edit
 
-export list_no_docs, diagnosedocs, fixdocs, pickandcopy
+export listdocs, diagnosedocs, fixdocs, pickandcopy
 
 getdocs(f) = Docs.Text(Docs.doc(f))
 hasdocs(f) = !occursin(r"^No documentation found.", string(getdocs(f)))
@@ -50,12 +50,36 @@ end
 #    f_data
 #end
 
-function list_no_docs(mod, footer = true, fun = false)
+function listdocs(mod, footer = true, fun = false)
     data = make_data(mod)
 #    f_data = format_data(data, fun)
     table = Table(Functions = data[:,1], Docs = data[:,2], Examples = data[:,3])
 #    return f_data, table
     return footer ? table : table[1:end-1, :]
+end
+
+"""
+apropos(x::Symbol)
+A simple extension of apropos, searches all names in all modules (both exported
+and not) for names that contain the symbol (case insensitive). 
+Defined in juliarc.jl.
+"""
+#function Base.apropos(x::Symbol)
+#    _search_module_for_name(Main, lowercase(string(x)))
+#end
+function _search_module_for_name(mod, s, seen=IdDict())
+    seen[mod] = mod
+    for sym in names(mod, true)
+        if contains(lowercase(string(sym)), s)
+            println("$mod.$sym")
+        end
+        if isdefined(mod, sym)
+            obj = getfield(mod, sym)
+            if isa(obj, Module) && !haskey(seen, obj)
+                _search_module_for_name(obj, s, seen)
+            end
+        end
+    end
 end
 
 # TODO Fix buggy shell and pkg starting lines
@@ -105,7 +129,7 @@ function pickandcopy(n=25, keeprepl = false)
     res, latest_entry[7:end]
 end
 
-findfixables(table) = table.Functions[.!(table.Docs .| table.Examples)]
+findfixables(table) = table.Functions[.!(table.Docs .& table.Examples)]
 
 function buildpastestring(template_str, copypicks)
     template_str * """
@@ -138,7 +162,7 @@ function instructprompt(doctarget = "your functions")
 end
 
 function diagnosedocs(mod, verbose = true)
-    table = list_no_docs(mod, false, false)
+    table = listdocs(mod, false, false)
     fixables = findfixables(table)
     if isempty(fixables)
         return println("Yay! All your exports have docs and examples!")
@@ -227,7 +251,7 @@ function docstring_wizard(mod, quiet = true)
     if quiet
         println(banner)
     end
-    t = list_no_docs(mod)
+    t = listdocs(mod)
 
     todo_docs = t.Functions[findall(t.Docs)]
     todo_examples = t.Functions[findall(t.Examples)]

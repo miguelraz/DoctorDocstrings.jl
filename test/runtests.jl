@@ -52,13 +52,13 @@ using REPL
     @test hasdocs(testme.i)
     @test !hasexamples(testme.i)
 
-   # list = list_no_docs(testme)
+   # list = listdocs(testme)
    # @test length(list) == 24
    # @test list[2,3] == "-"
    # @test list[3,3] == "Yes"
    # @test all(list[4:7, 3] .== "-")
 
-@test length(list_no_docs(testme)) == 7
+@test length(listdocs(testme)) == 7
 @test length(diagnosedocs(testme)) == 3
 
 

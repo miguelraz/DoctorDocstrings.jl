@@ -8,7 +8,7 @@
 
 With it you can:
 
-* `list_no_docs(OhMyREPL)` to get a `TypedTable` of the exports and if they have docs/examples.
+* `listdocs(OhMyREPL)` to get a `TypedTable` of the exports and if they have docs/examples.
 * `diagnosedocs(LightGraphs)` to get a `TypedTable` of exports that need fixing.
 * `pickandcopy(n)` to choose up to the last `n` items in your REPL and paste them into your clipboard
 * `fixdocs()` to select from your REPL history and step into the last selection.
@@ -24,9 +24,9 @@ With it you can:
 
 In order to get started, just add the package (with **Julia ≥ 1.3**) and
 
-```julia-repl
+```julia
 julia> using DoctorDocstrings
-julia> nodocs(DifferentialEquations)
+julia> listdocs(DifferentialEquations)
 julia> # Play in the REPL for a few commands
 julia> fixdocs() 
 ```
@@ -50,7 +50,7 @@ It's usually cumbersome to have to copy-paste your REPL history when you are exp
 Here's the result from running `diagnosedocs(OrdinaryDiffEq)`:
 
 ```julia-repl
-julia> list_no_docs(OrdinaryDiffEq)
+julia> listdocs(OrdinaryDiffEq)
 Table with 3 columns and 396 rows:
       Functions                  Docs   Examples
     ┌───────────────────────────────────────────
@@ -147,6 +147,8 @@ This is the job of `pickandcopy`, which is **super useful** if you are preparing
 Lastly, you will be prompted if you want to `@edit` your last selection. In the example above, I would jump straight in to edit the docstring for `CliqueGraph` with a chosen template.
 
 The template will be chosen through a terminal menu, but you can define your own string and pass it to `fixdocs(template)` and it should `Just Work`TM.
+
+The templates for the time being are `Basic, BlueStyle, Type, and Package quickstart/tldr`.
 
 As always, PRs welcome.
 
