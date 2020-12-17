@@ -99,6 +99,7 @@ function pickandcopy(n=25, keeprepl = false)
     else
         @info "Something got borked. Try again."
     end
+    clipboard(res)
     # TODO Fix this horrible hack to not get the "julia> "
     # latest_entry is a string, so this should "work"
     res, latest_entry[7:end]
