@@ -287,10 +287,8 @@ Welcome to MY_PACKAGE.jl!
 
 This packages is useful for a) ... b) ... c) ...
 
-Here's the top 5 workflows in this package
+Here's the top 5 functions in this package:
 
-Examples
-====
 """
 
 docstr_templates = [doc_example_template, BlueStyle_func_template, type_template, quickstart_template]
