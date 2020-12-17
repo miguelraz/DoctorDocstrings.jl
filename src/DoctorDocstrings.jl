@@ -1,6 +1,6 @@
 module DoctorDocstrings
 
-using TerminalMenus
+using REPL.TerminalMenus
 using Printf
 using TypedTables
 using REPL
@@ -127,18 +127,52 @@ function history_parser(n = 50, maxlen = 1000)
     reverse!(res)
 end
 
-function pickandcopy(n=25, keeprepl = false)
+# oh lord plz don't look at this code
+
+# But if you do, know that it resets your REPL state to the first selection you made under pickandcopy()
+function appenddisplays!(str)
+    for i in 1:length(str)
+        io = IOBuffer()
+        show(io, @eval $(Meta.parse(str[i][7:end])))
+        str[i] = chomp(str[i]) * '\n' * String(take!(io)) * "\n\n"
+        close(io)
+    end
+end
+
+"""
+    pickandcopy(n=25)
+
+Select from your previous REPL history up to `n` elements to copy into your clipboard, along with their 
+`display` results. Ideally, followed by `fixdocs()` and pasting into your editor.
+Note that every line in your REPL history gets re-`@eval`'ed so as to also attach the `display`s that 
+come after REPL input. If your code relies on behaviours that display, this code may not work.
+
+Examples
+====
+```
+julia> pickandcopy()
+```
+"""
+function pickandcopy(n=25)
+    # Make a menu with the REPL history strings
     options = history_parser(n)
     menu = MultiSelectMenu(options, pagesize = n)
     choiceset = request("Pick your history to copy:", menu)
-    picks = [options[i] for i in sort(collect(choiceset))]
-    latest_entry = picks[end]
-    res = join(picks, '\n')
     if length(choiceset) > 0
         @info "Copied $(length(choiceset)) items to clipboard"
     else
         @info "Something got borked. Try again."
+        return nothing
     end
+
+    picks = [options[i] for i in sort(collect(choiceset))]
+
+    # take the latest one, we will @edit it later on
+    latest_entry = picks[end]
+    # append the REPL displays to each (note the '.'!) input
+    appenddisplays!(picks)
+    # this join doesn't need to split with '\n' because it happenend it appenddisplays!
+    res = join(picks)
     clipboard(res)
     # TODO Fix this horrible hack to not get the "julia> "
     # latest_entry is a string, so this should "work"

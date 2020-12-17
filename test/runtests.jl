@@ -1,7 +1,7 @@
 using DoctorDocstrings
 import DoctorDocstrings: hasdocs, hasexamples
 using Test
-using TerminalMenus
+using REPL.TerminalMenus
 using Printf
 using TypedTables
 using REPL
