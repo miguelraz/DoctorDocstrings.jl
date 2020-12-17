@@ -1,4 +1,5 @@
 using DoctorDocstrings
+import DoctorDocstrings: hasdocs, hasexamples
 using Test
 using TerminalMenus
 using Printf
@@ -59,7 +60,7 @@ using REPL
    # @test all(list[4:7, 3] .== "-")
 
 @test length(listdocs(testme)) == 7
-@test length(diagnosedocs(testme)) == 3
+@test length(diagnosedocs(testme)) == 5
 
 
 
