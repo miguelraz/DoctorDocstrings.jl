@@ -37,7 +37,7 @@ julia> fixdocs()
 
 It's usually cumbersome to have to copy-paste your REPL history when you are exploring what works. Now, you can inject it into a docstring template. Just figure out which docstrings you are missing with `nodocs(Plots)`, type your setup into the REPL, select the appropriate history with `fixdocs()` and paste the docstring into your favorite editor.
 
-\alert{This software is VERY much alpha, but it should work for simple module structures. `Base` in particular is tricky to handle. Many things are hardcoded and not too extensible. Please, if you find it borking out, send an issue/PR.}
+\alert{This software is VERY much alpha, but it should work for simple module structures. The code is janky, hacky, many things are hardcoded and not too extensible (for now). Please, [don't judge me when you look at the internals](https://artsandculture.google.com/experiment/blob-opera/AAHWrq360NcGbw?cp=e30.) and if you find it borking out, send an issue/PR.}
 
 \end{section}
 
