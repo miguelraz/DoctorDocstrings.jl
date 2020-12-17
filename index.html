@@ -122,7 +122,7 @@ padding-right:  10px;
 <div class="lead">DoctorDocstrings.jl helps you list the exports in your package that don&#39;t have docstrings/examples, set a docstring template and copy your REPL history directly into the docstring.</div>
 <p>With it you can:</p>
 <ul>
-<li><p><code>list_no_docs&#40;OhMyREPL&#41;</code> to get a <code>TypedTable</code> of the exports and if they have docs/examples.</p>
+<li><p><code>listdocs&#40;OhMyREPL&#41;</code> to get a <code>TypedTable</code> of the exports and if they have docs/examples.</p>
 </li>
 <li><p><code>diagnosedocs&#40;LightGraphs&#41;</code> to get a <code>TypedTable</code> of exports that need fixing.</p>
 </li>
@@ -141,10 +141,10 @@ padding-right:  10px;
       <div class="col-lg-10 mx-auto">
         <h2>Getting started</h2></p>
 <p>In order to get started, just add the package &#40;with <strong>Julia ≥ 1.3</strong>&#41; and</p>
-<pre><code class="julia-repl hljs"><span class="hljs-meta">julia&gt;</span><span class="julia"> <span class="hljs-keyword">using</span> DoctorDocstrings
-</span><span class="hljs-meta">julia&gt;</span><span class="julia"> nodocs(DifferentialEquations)
-</span><span class="hljs-meta">julia&gt;</span><span class="julia"> <span class="hljs-comment"># Play in the REPL for a few commands</span>
-</span><span class="hljs-meta">julia&gt;</span><span class="julia"> fixdocs()</span></code></pre>
+<pre><code class="julia hljs">julia&gt; <span class="hljs-keyword">using</span> DoctorDocstrings
+julia&gt; listdocs(DifferentialEquations)
+julia&gt; <span class="hljs-comment"># Play in the REPL for a few commands</span>
+julia&gt; fixdocs()</code></pre>
 <br/>
 <p>It&#39;s usually cumbersome to have to copy-paste your REPL history when you are exploring what works. Now, you can inject it into a docstring template. Just figure out which docstrings you are missing with <code>nodocs&#40;Plots&#41;</code>, type your setup into the REPL, select the appropriate history with <code>fixdocs&#40;&#41;</code> and paste the docstring into your favorite editor.</p>
 <div class="alert alert-info" role="alert">
@@ -159,7 +159,7 @@ This software is VERY much alpha, but it should work for simple module structure
       <div class="col-lg-10 mx-auto">
         <h2>Workflow</h2></p>
 <p>Here&#39;s the result from running <code>diagnosedocs&#40;OrdinaryDiffEq&#41;</code>:</p>
-<pre><code class="julia-repl hljs"><span class="hljs-meta">julia&gt;</span><span class="julia"> list_no_docs(OrdinaryDiffEq)
+<pre><code class="julia-repl hljs"><span class="hljs-meta">julia&gt;</span><span class="julia"> listdocs(OrdinaryDiffEq)
 </span>Table with 3 columns and 396 rows:
       Functions                  Docs   Examples
     ┌───────────────────────────────────────────
@@ -241,6 +241,7 @@ fadjlist ne
 <p>This is the job of <code>pickandcopy</code>, which is <strong>super useful</strong> if you are preparing for a live demo and want to only copy your inputs that worked. Notice that I didn&#39;t select my flubs, and they don&#39;t get added to my clipboard.</p>
 <p>Lastly, you will be prompted if you want to <code>@edit</code> your last selection. In the example above, I would jump straight in to edit the docstring for <code>CliqueGraph</code> with a chosen template.</p>
 <p>The template will be chosen through a terminal menu, but you can define your own string and pass it to <code>fixdocs&#40;template&#41;</code> and it should <code>Just Work</code>TM.</p>
+<p>The templates for the time being are <code>Basic, BlueStyle, Type, and Package quickstart/tldr</code>.</p>
 <p>As always, PRs welcome.</p>
 <p>      </div>
     </div>
