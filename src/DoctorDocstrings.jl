@@ -50,6 +50,22 @@ end
 #    f_data
 #end
 
+"""
+    listdocs(m::`Module`) -> `TypedTable`
+
+Returns a `TypedTable` with all the exported names in `m` and `true/false` if they have 
+`docstrings/examples`.
+
+Examples
+====
+```jldoctest
+
+julia> using DoctorDocstrings
+
+julia> listdocs(DoctorDocstrings)
+
+```
+"""
 function listdocs(mod, footer = true, fun = false)
     data = make_data(mod)
 #    f_data = format_data(data, fun)
@@ -161,6 +177,21 @@ function instructprompt(doctarget = "your functions")
     @info "You will be able to copy/paste them by calling 'fixdocs()'"
 end
 
+"""
+    diagnosedocs(m::`Module`) -> `TypedTable`
+
+Returns a TypedTable with all the exported names in `m` that do not have either docs or examples.
+
+Examples
+====
+```jldoctest
+julia> using DoctorDocstrings
+
+julia> listdocs(DoctorDocstrings)
+
+julia> diagnosedocs(DoctorDocstrings)
+```
+"""
 function diagnosedocs(mod, verbose = true)
     table = listdocs(mod, false, false)
     fixables = findfixables(table)
@@ -174,6 +205,23 @@ function diagnosedocs(mod, verbose = true)
 end
 
 
+"""
+    fixdocs()
+
+Call this function to pick from your previous REPL history and `@edit`
+your last REPL selected input. Play around in the REPL first to know what
+should go into the docs, and then call `fixdocs`.
+
+Examples
+====
+```jldoctest
+julia> using DoctorDocstrings
+
+julia> listdocs(DoctorDocstrings)
+
+julia> fixdocs()
+```
+"""
 function fixdocs(template = picktemplate(docstr_templates), nhistory = 25)
     picks, latest_entry = pickandcopy(nhistory)
     pastestring = buildpastestring(template, picks)
