@@ -12,6 +12,7 @@ REPL = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
+Documenter = "0.26"
 TypedTables = "1.2"
 julia = "1"
 
