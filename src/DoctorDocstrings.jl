@@ -3,10 +3,11 @@ module DoctorDocstrings
 using REPL.TerminalMenus
 using Printf
 using TypedTables
+using PrettyTables
 using REPL
 import InteractiveUtils: clipboard, @edit
 
-export listdocs, diagnosedocs, fixdocs, pickandcopy
+export listdocs, diagnosedocs, fixdocs, pickandcopy, appenddisplays!, @fixdocs
 
 getdocs(f) = Docs.Text(Docs.doc(f))
 hasdocs(f) = !occursin(r"^No documentation found.", string(getdocs(f)))
@@ -66,12 +67,9 @@ julia> listdocs(DoctorDocstrings)
 
 ```
 """
-function listdocs(mod, footer = true, fun = false)
+function listdocs(mod)
     data = make_data(mod)
-#    f_data = format_data(data, fun)
-    table = Table(Functions = data[:,1], Docs = data[:,2], Examples = data[:,3])
-#    return f_data, table
-    return footer ? table : table[1:end-1, :]
+    table = @views Table(Functions = data[:,1], Docs = data[:,2], Examples = data[:,3])
 end
 
 """
@@ -118,7 +116,7 @@ function history_parser(n = 50, maxlen = 1000)
         # skip over the # time
         i += 2
         while !startswith(lines[i], "# mode: ") && i < min(len, maxlen)
-            temp = lines[i][2:end] * '\n' * temp
+            temp = @views lines[i][2:end] * '\n' * temp
             i += 1
         end
         push!(res, start * temp)
@@ -130,77 +128,92 @@ end
 # oh lord plz don't look at this code
 
 # But if you do, know that it resets your REPL state to the first selection you made under pickandcopy()
-function appenddisplays!(str)
-    for i in 1:length(str)
+function appenddisplays!(strs)
+    for (i, _) in enumerate(strs)
+        # Skip if there's a 'using Foo'
+        contains(strs[i], "using") && continue
+        # Skip if line ends with ';'
+        endswith(strs[i], ';') && continue
         io = IOBuffer()
-        show(io, @eval $(Meta.parse(str[i][7:end])))
-        str[i] = chomp(str[i]) * '\n' * String(take!(io)) * "\n\n"
+        expr = Meta.parse(@view strs[i][7:end])
+        print(io, @eval Main $(expr))
+        strs[i] = chomp(strs[i]) * '\n' * String(take!(io)) * "\n\n"
         close(io)
     end
 end
 
 """
-    pickandcopy(n=25)
+    pickandcopy(n=25, appenddisplays = false)
 
-Select from your previous REPL history up to `n` elements to copy into your clipboard, along with their 
-`display` results. Ideally, followed by `fixdocs()` and pasting into your editor.
+Select from your previous REPL history up to `n` elements to copy into your clipboard,
+along with their  `display` results and followed by `fixdocs()` and pasting into your editor.
 Note that every line in your REPL history gets re-`@eval`'ed so as to also attach the `display`s that 
 come after REPL input. If your code relies on behaviours that display, this code may not work.
+!!! warning
+The macro is **DIRTY**, and will overwrite your local bindings.
 
 Examples
 ====
 ```
+julia> using LightGraphs
+
+julia> g = CliqueGraph(3,3)
+{9,12} undirected simple Int64 graph
+
 julia> pickandcopy()
 ```
 """
-function pickandcopy(n=25)
+function pickandcopy(n=25, appenddisplays = false)
     # Make a menu with the REPL history strings
     options = history_parser(n)
-    menu = MultiSelectMenu(options, pagesize = n)
+    menu = MultiSelectMenu(String.(strip.(options)), pagesize = n)
     choiceset = request("Pick your history to copy:", menu)
-    if length(choiceset) > 0
-        @info "Copied $(length(choiceset)) items to clipboard"
-    else
+    if length(choiceset) == 0 
         @info "Something got borked. Try again."
         return nothing
     end
-
     picks = [options[i] for i in sort(collect(choiceset))]
 
     # take the latest one, we will @edit it later on
     latest_entry = picks[end]
-    # append the REPL displays to each (note the '.'!) input
-    appenddisplays!(picks)
+
+    if appenddisplays
+        appenddisplays!(picks)
+    end
+
     # this join doesn't need to split with '\n' because it happenend it appenddisplays!
     res = join(picks)
+    @info picks
     clipboard(res)
+    @info "Copied $(length(choiceset)) items to clipboard"
     # TODO Fix this horrible hack to not get the "julia> "
     # latest_entry is a string, so this should "work"
     res, latest_entry[7:end]
 end
 
-findfixables(table) = table.Functions[.!(table.Docs .& table.Examples)]
+findfixables(table) = filter(x -> !x.Docs || !x.Examples, table)
 
 function buildpastestring(template_str, copypicks)
     template_str * """
 Examples
 ====
 ```jldoctest
-""" * '\n' * copypicks * "\n```\n\"\"\""
+""" * '\n' * copypicks * "```\n\"\"\""
 end
 
-#1. Get REPL history DONE
+#1. Get REPL history
 #2. find first fixable doc string
 #2.5 Choose a template
 #3. append Example header * REPL History to template, 
 #3.5 put that into the clipboard
 #4. open editor
 function latesteditprompt(latest_entry)
-    @info "Templated docstrings with example has been pasted into your system clipboard"
-    @info "Would you like to @edit $(latest_entry[1:end-1]) ? Y/N"
+    @info "Docstrings template copied to clipboard"
+    @info "Would you like to @edit $(latest_entry) ? Y/N"
     if any(occursin.(["yes", "Y", "YES", "y", "Yes"], readline()))
-        expr = Meta.parse(latest_entry)
-        @eval @edit $(expr)
+        latest_entry = strip(latest_entry)
+#        expr = Meta.parse(latest_entry)
+#        edit(expr)
     else
         @info "Didn't get a Yes/YES/y/Y/Yes answer. Appointment canceled."
     end
@@ -227,15 +240,15 @@ julia> diagnosedocs(DoctorDocstrings)
 ```
 """
 function diagnosedocs(mod, verbose = true)
-    table = listdocs(mod, false, false)
+    table = listdocs(mod)[begin:end-1]
     fixables = findfixables(table)
     if isempty(fixables)
-        return println("Yay! All your exports have docs and examples!")
+        return println("🎉 All your exports have docs and examples! 🎉")
     end
     if verbose
         instructprompt()
     end
-    return Table(NeedFixes = fixables)
+    return fixables
 end
 
 
@@ -257,14 +270,18 @@ julia> fixdocs()
 ```
 """
 function fixdocs(template = picktemplate(docstr_templates), nhistory = 25)
-    picks, latest_entry = pickandcopy(nhistory)
+    picks, latest_entry = pickandcopy(nhistory, true)
     pastestring = buildpastestring(template, picks)
     clipboard(pastestring)
-    latesteditprompt(latest_entry)
+end
+
+macro fixdocs(ex)
+    fixdocs()
+    @eval Main @edit $ex
 end
 
 function picktemplate(docstr_templates)
-    menu = RadioMenu(["Basic", "BlueStyle", "Type", "Package quickstart"])
+    menu = RadioMenu(["Basic", "Doctests", "BlueStyle", "BlueStyleType", "Package quickstart"])
     choice = request("Choose your template", menu)
     if choice != -1
         nothing
@@ -325,7 +342,8 @@ Here's the top 5 functions in this package:
 
 """
 
-docstr_templates = [doc_example_template, BlueStyle_func_template, type_template, quickstart_template]
+doctests_template = ""
+docstr_templates = [doc_example_template, doctests_template, BlueStyle_func_template, type_template, quickstart_template]
 
 function docstring_wizard(mod, quiet = true)
     if quiet
